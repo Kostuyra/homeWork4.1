@@ -9,12 +9,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.GetMapping;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -134,5 +137,37 @@ class StudentControllerTest {
                         .get("/student/" + STUDENT_ID + "/faculty")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void getCount() throws Exception {
+        when(studentRepository.getStudentsCount()).thenReturn(4);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/count")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getAvgAgeStudents() throws Exception {
+        when(studentRepository.getAvgAgeStudents()).thenReturn(20f);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/avg")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getFiveStudents() throws Exception {
+        when(studentRepository.getLastFive()).thenReturn(STUDENT_LIST);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/last")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(STUDENT_LIST)));
     }
 }
